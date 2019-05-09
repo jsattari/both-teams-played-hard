@@ -1,2 +1,2 @@
-# both-teams-played-hard
+# Versus
 Completed projects
