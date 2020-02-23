@@ -1,2 +1,2 @@
 # Versus
-Completed projects
+Visualizing game by game performance so far this season
