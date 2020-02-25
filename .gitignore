@@ -137,3 +137,6 @@ dmypy.json
 
 # vscode directories
 .vscode
+
+# just leave my repo alone
+visualization.html
