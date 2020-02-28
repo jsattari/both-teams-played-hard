@@ -11,13 +11,21 @@ data = pd.read_csv(
     os.path.dirname(os.getcwd()) + '/Versus/data/merged_games.csv', index_col=False
 )
 
-# group the data and classify it for bokeh viz
-grouped_data = data.groupby('PLAYER_NAME').agg(
-    {'PTS': ['min', 'max', 'mean', 'var', 'median'], 'FGA': 'sum','GAME_DATE_EST':['min', 'max']})
-source = ColumnDataSource(grouped_data)
+data = data[['PLAYER_NAME', 'PTS', 'FGA', 'GAME_DATE_EST']]
 
-print(grouped_data.head())
-print(grouped_data.columns)
+data['GAME_DATE_EST'] = pd.to_datetime(data['GAME_DATE_EST'])
+
+data['GAME_DATE_EST'] = data['GAME_DATE_EST'].dt.strftime('%Y')
+
+# data = data.groupby('PLAYER_NAME')
+# group the data and classify it for bokeh viz
+# grouped_data = data.groupby('PLAYER_NAME').agg(
+#    {'PTS': ['min', 'max', 'mean', 'var', 'median'], 'FGA': 'sum','GAME_DATE_EST':['min', 'max']})
+source = ColumnDataSource(data={
+    'x': data.loc[2003].PTS,
+    'y': data.loc[2003].FGA,
+    'player': data.loc[2003].PLAYER_NAME
+    })
 
 # determining plot attributes
 p = figure(
@@ -26,13 +34,13 @@ p = figure(
 
 # setting axis
 p.square(
-    x='PTS_mean', y='FGA_sum', source=source, size=5
+    x='x', y='y', source=source, size=5
 )
 
 # determining hovertool 'hovers'
 hover_tool = HoverTool(
-    tooltips=[('team', '@PLAYER_NAME'), ('avg_pts', '@PTS_mean'),
-              ('total_fga', '@FGA_sum')]
+    tooltips=[
+        ('player_name', '@player')]
 )
 
 # determining slider 
@@ -42,15 +50,15 @@ slider = Slider(
 
 # Define a callback function: callback
 def callback(attr, old, new):
- 
-    # Read the current value of the slider: scale
-    scale = slider.value
- 
-    # Compute the updated y using np.sin(scale/x): new_y
-    new_y = pd.np.sin(scale/x)
+    yr = slider.value
+    new_data = {
+        'x': data.loc[yr].PTS,
+        'y': data.loc[yr].FGA,
+        'player': data.loc[yr].PLAYER_NAME
+    }
  
     # Update source with the new data values
-    source.data = {'x': x, 'y': new_y}
+    source.data = new_data
 
 slider.on_change('value', callback)
 
