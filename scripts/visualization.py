@@ -5,7 +5,7 @@ from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.models.widgets import Select, Slider
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
-from bokeh.layouts import widgetbox, row
+from bokeh.layouts import row
 
 # path to data file
 data = pd.read_csv(
@@ -55,15 +55,24 @@ hover_tool = HoverTool(
         ('Total_FGA', '@FGA'),
         ('Location','@COURT')])
 
+# adding hovertool to glyph
+p.add_tools(hover_tool)
+
 # creating slider
 slider = Slider(
     start=filtered['GAME_DATE_EST'].min(),
     end=filtered['GAME_DATE_EST'].max(),
     value=filtered['GAME_DATE_EST'].min(), step=1, title="Season")
 
-# adding hovertool to glyph
-p.add_tools(hover_tool)
+# slider call back function
+def slider_update(attr, old, new):
+    new_year = slider.value
+    new_data = ColumnDataSource(filtered[filtered['GAME_DATE_EST'] == new_year])
+    source.data = new_data.data
 
 
-show(slider)
-show(p)
+slider.on_change('value', slider_update)
+
+layout = row(slider, p)
+
+show(layout)
