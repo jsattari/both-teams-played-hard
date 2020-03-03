@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from bokeh.io import output_file, show, curdoc
-from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.models import ColumnDataSource, HoverTool, Slope
 from bokeh.models.widgets import Select, Slider
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
@@ -39,8 +39,13 @@ source = ColumnDataSource(filtered[filtered['GAME_DATE_EST'] == 2003])
 # determining figure attributes
 p = figure(
     plot_width=700, plot_height=500,
-    toolbar_location="right", title="Scoring Efficiency by Totals",
+    toolbar_location="above", title="Scoring Efficiency by Totals",
     title_location='above')
+
+p.title.text_font_size = '25px'
+p.title.text_color = 'red'
+p.xaxis.axis_label = 'Total_Points'
+p.yaxis.axis_label = 'Total_Field_Goal_Attempts'
 
 # setting axis
 p.square(
@@ -73,6 +78,7 @@ def slider_update(attr, old, new):
 
 slider.on_change('value', slider_update)
 
-layout = row(slider, p)
+layout = row(
+    slider, p)
 
 show(layout)
