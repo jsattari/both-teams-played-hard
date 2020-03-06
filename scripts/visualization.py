@@ -1,10 +1,9 @@
 import pandas as pd
 import os
 from bokeh.io import output_file, show, curdoc
-from bokeh.models import ColumnDataSource, HoverTool, Slope
+from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.models.widgets import Select, Slider
 from bokeh.plotting import figure
-from bokeh.transform import factor_cmap
 from bokeh.layouts import row
 
 
@@ -20,6 +19,8 @@ def main():
     # 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'REB', 'AST', 'STL',
     # 'BLK', 'TO', 'PF', 'PTS', 'PLUS_MINUS', 'GAME_DATE_EST', 'COURT'
 
+    output_file('visualization.html')
+
     # selecting which columns to include in dataset
     filtered = data[['PLAYER_NAME', 'PTS', 'FGA', 'GAME_DATE_EST', 'FGM', 'COURT']]
 
@@ -32,7 +33,7 @@ def main():
     filtered.fillna(0)
 
     # declare source data for glyphs
-    source = ColumnDataSource(filtered[filtered['GAME_DATE_EST'] == 2003])
+    source = ColumnDataSource(filtered.loc[filtered['GAME_DATE_EST'] == 2003])
 
     # coloring
     # index_cmap = factor_cmap(
@@ -78,7 +79,7 @@ def main():
     def slider_update(attr, old, new):
         new_year = slider.value
         new_data = ColumnDataSource(
-            filtered[filtered['GAME_DATE_EST'] == new_year])
+            filtered.loc[filtered['GAME_DATE_EST'] == new_year])
         source.data = new_data.data
 
 
@@ -87,7 +88,7 @@ def main():
     layout = row(
         slider, p)
 
-    show(layout)
+    curdoc().add_root(layout)
 
 if __name__ == "__main__":
     main()
